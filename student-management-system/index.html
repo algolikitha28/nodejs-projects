@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Management</title>
+</head>
+<body>
+
+  <h2>Student Registration</h2>
+
+  <input type="text" id="name" placeholder="Student Name">
+  <input type="text" id="regNo" placeholder="Register Number">
+  <button onclick="submitData()">Submit</button>
+
+  <p id="msg"></p>
+
+  <hr>
+
+  <button onclick="loadStudents()">Show Students</button>
+
+  <h2>Student List</h2>
+
+  <table border="1" id="studentTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Register Number</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function submitData() {
+      const name = document.getElementById("name").value;
+      const regNo = document.getElementById("regNo").value;
+
+      const response = await fetch("/add-student", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, regNo })
+      });
+
+      const text = await response.text();
+      document.getElementById("msg").innerText = text;
+    }
+
+    async function loadStudents() {
+      const response = await fetch("/students");
+      const students = await response.json();
+
+      const tbody = document.querySelector("#studentTable tbody");
+
+      tbody.innerHTML = "";
+
+      students.forEach(student => {
+        const row = `
+          <tr>
+            <td>${student.id}</td>
+            <td>${student.name}</td>
+            <td>${student.regNo}</td>
+          </tr>
+        `;
+
+        tbody.innerHTML += row;
+      });
+    }
+  </script>
+
+</body>
+</html>
