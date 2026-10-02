@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Gene Database</title>
+</head>
+
+<body>
+
+    <h1>Gene Database</h1>
+
+    <input type="text" id="gene_name" placeholder="Gene Name">
+
+    <input type="text" id="sequence" placeholder="Sequence">
+
+    <button onclick="addGene()">Add Gene</button>
+
+    <button onclick="loadGenes()">View Genes</button>
+
+    <ul id="geneList"></ul>
+
+    <h2>Update Gene</h2>
+
+<input type="number" id="update_id" placeholder="Gene ID">
+
+<input type="text" id="update_gene_name" placeholder="New Gene Name">
+
+<input type="text" id="update_sequence" placeholder="New Sequence">
+
+<button onclick="updateGene()">Update Gene</button>
+
+
+<script>
+
+function addGene() {
+
+    const gene_name =
+        document.getElementById("gene_name").value;
+
+    const sequence =
+        document.getElementById("sequence").value;
+
+    fetch('/genes', {
+
+        method: 'POST',
+
+        headers: {
+            'Content-Type': 'application/json'
+        },
+
+        body: JSON.stringify({
+            gene_name,
+            sequence
+        })
+
+    })
+
+    .then(response => response.text())
+
+    .then(data => {
+        alert(data);
+    });
+}
+
+
+
+function loadGenes() {
+
+    fetch('/genes')
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        const geneList =
+            document.getElementById("geneList");
+
+        geneList.innerHTML = "";
+
+        data.forEach(gene => {
+
+            const li =
+                document.createElement("li");
+
+           li.innerHTML = `
+                ${gene.id} : ${gene.gene_name} : ${gene.sequence}
+
+                <button onclick="deleteGene(${gene.id})">
+                    Delete
+                </button>
+            `;
+            geneList.appendChild(li);
+
+        });
+
+    });
+
+}
+
+function updateGene() {
+
+    const id =
+        document.getElementById("update_id").value;
+
+    const gene_name =
+        document.getElementById("update_gene_name").value;
+
+    const sequence =
+        document.getElementById("update_sequence").value;
+
+    fetch(`/genes/${id}`, {
+
+        method: 'PUT',
+
+        headers: {
+            'Content-Type': 'application/json'
+        },
+
+        body: JSON.stringify({
+            gene_name,
+            sequence
+        })
+
+    })
+
+    .then(response => response.text())
+
+    .then(data => {
+
+        alert(data);
+
+        loadGenes();
+    });
+}
+
+
+
+function deleteGene(id) {
+
+    fetch(`/genes/${id}`, {
+
+        method: 'DELETE'
+
+    })
+
+    .then(response => response.text())
+
+    .then(data => {
+
+        alert(data);
+
+        loadGenes();
+    });
+}
+
+</script>
+
+</body>
+</html>
